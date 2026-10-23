@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.Alignment
@@ -41,7 +40,7 @@ import java.util.Date
 import java.util.Locale
 
 private val themes = listOf("Hacker Green", "Amber CRT", "Matrix Blue", "Retro White")
-private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif", "Nothing CRT")
+private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif")
 
 @Composable
 fun TermNotesApp(
@@ -96,7 +95,6 @@ fun TermNotesApp(
     val mono = when (fontName) {
         "System Serif" -> FontFamily.Serif
         "System Sans Serif" -> FontFamily.SansSerif
-        "Nothing CRT" -> FontFamily(Font(R.font.nothing_crt))
         else -> FontFamily.Monospace
     }
 
