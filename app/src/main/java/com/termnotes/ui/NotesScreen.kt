@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -230,14 +232,29 @@ fun TermNotesApp(
             onDismissRequest = { showSettings = false }, containerColor = palette.panel,
             title = { Text("SETTINGS", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { showThemePicker = true }, modifier = Modifier.fillMaxWidth()) { Text("Theme: $themeName", color = palette.accent, fontFamily = mono) }
                     OutlinedButton(onClick = { showFontPicker = true }, modifier = Modifier.fillMaxWidth()) { Text("Font: $fontName", color = palette.accent, fontFamily = mono) }
                     Row(verticalAlignment = Alignment.CenterVertically) { Text("CRT scanlines", Modifier.weight(1f), color = palette.text); Switch(crtEnabled, { crtEnabled = it; AppPreferences.setCrt(context, it) }) }
                     Row(verticalAlignment = Alignment.CenterVertically) { Text("Save confirmation sound", Modifier.weight(1f), color = palette.text); Switch(soundEnabled, { soundEnabled = it; AppPreferences.setSound(context, it) }) }
                     OutlinedButton(onClick = { exportLauncher.launch("termnotes-backup.json") }, modifier = Modifier.fillMaxWidth()) { Text("EXPORT JSON BACKUP", color = palette.accent, fontFamily = mono) }
                     OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "text/*", "*/*")) }, modifier = Modifier.fillMaxWidth()) { Text("IMPORT JSON (MERGE)", color = palette.accent, fontFamily = mono) }
-                    Text("About TERMNOTES · Offline notes stored on this device. Backups are saved only when you choose a file location. Fira Code and VT323 currently use the system monospace fallback.", color = palette.muted, fontSize = 11.sp)
+                    HorizontalDivider(color = palette.border)
+                    Text("DEVELOPER", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold)
+                    val versionName = remember(context) { runCatching {
+                        @Suppress("DEPRECATION")
+                        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown"
+                    }.getOrDefault("Unknown") }
+                    Text("Developer: @biggybird", color = palette.text, fontFamily = mono, fontSize = 12.sp)
+                    Text("App: TERMNOTES", color = palette.text, fontFamily = mono, fontSize = 12.sp)
+                    Text("Version: $versionName", color = palette.text, fontFamily = mono, fontSize = 12.sp)
+                    Text("Platform: Native Android · Kotlin · Jetpack Compose", color = palette.text, fontFamily = mono, fontSize = 12.sp)
+                    Text("Storage: Local / offline", color = palette.text, fontFamily = mono, fontSize = 12.sp)
+                    Text("TERMNOTES is an offline-first terminal-inspired notes app. Notes stay on this device unless exported.", color = palette.muted, fontSize = 11.sp, fontFamily = mono)
+                    OutlinedButton(onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/biggybird/termnotes-android"))
+                        runCatching { context.startActivity(intent) }.onFailure { message = "No browser app is available to open the repository." }
+                    }, modifier = Modifier.fillMaxWidth()) { Text("OPEN GITHUB REPOSITORY ↗", color = palette.accent, fontFamily = mono) }
                 }
             },
             confirmButton = { TextButton(onClick = { showSettings = false }) { Text("DONE", color = palette.accent, fontFamily = mono) } }
