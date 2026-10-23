@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +41,7 @@ import java.util.Date
 import java.util.Locale
 
 private val themes = listOf("Hacker Green", "Amber CRT", "Matrix Blue", "Retro White")
-private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif")
+private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif", "Nothing CRT")
 
 @Composable
 fun TermNotesApp(
@@ -95,6 +96,7 @@ fun TermNotesApp(
     val mono = when (fontName) {
         "System Serif" -> FontFamily.Serif
         "System Sans Serif" -> FontFamily.SansSerif
+        "Nothing CRT" -> FontFamily(Font(R.font.vt323_regular))
         else -> FontFamily.Monospace
     }
 
