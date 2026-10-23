@@ -1,5 +1,8 @@
 # TERMNOTES
 
+> **[⬇ Download the latest TERMNOTES APK](https://github.com/biggybird/termnotes-android/releases/download/latest-apk/app-debug.apk)**  
+> This direct link is updated automatically by the successful `main`-branch build. The repository is private, so you must be signed in with repository access. This is a debug APK for testing.
+
 A native Android terminal-inspired notes app built with Kotlin, Jetpack Compose, Material 3, and Room. It works offline and stores notes on the device.
 
 ## Current features
@@ -18,7 +21,7 @@ A native Android terminal-inspired notes app built with Kotlin, Jetpack Compose,
 
 ## Appearance and fonts
 
-Theme selection and font selection are saved locally. Typography options are honest Android system families: System Monospace, System Serif, and System Sans Serif. Fira Code and VT323 are not currently bundled, so the app does not advertise them as installed custom fonts. No remote fonts are loaded.
+Theme selection and font selection are saved locally. Typography includes System Monospace, System Serif, System Sans Serif, and the bundled VT323 retro terminal typeface shown in the selector as “Nothing CRT.” Its SIL Open Font License is included at `app/src/main/assets/licenses/OFL-VT323.txt`. No remote fonts are loaded.
 
 CRT scanlines and the save sound are off by default. Scanlines use a lightweight Compose drawing layer. Save confirmation uses a short Android system notification tone after a successful note save and releases the tone generator after playback.
 
@@ -73,11 +76,11 @@ APK output: `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Verification notes
 
-A successful CI APK build verifies compilation and artifact creation, but it does not prove all runtime behavior. The workflow now also runs unit tests and lint. Emulator and physical-device testing must be reported separately when performed. Fira Code and VT323 are not bundled in the current source and therefore fall back to the system monospace font.
+A successful CI APK build verifies compilation and artifact creation, but it does not prove all runtime behavior. The workflow now also runs unit tests and lint. Emulator and physical-device testing must be reported separately when performed. The Nothing CRT option uses the bundled VT323 font; other system font options use their corresponding Android system families.
 
 ## Known limitations
 
 - The Markdown preview is intentionally lightweight and does not implement the entire Markdown specification.
-- Custom font assets such as Fira Code and VT323 are not bundled; the available choices are Android system font families.
+- Fira Code is not bundled. The Nothing CRT option uses the bundled, licensed VT323 font.
 - Command Up/Down history depends on the Android keyboard exposing arrow key events.
 - No signed production release configuration or physical-device test is claimed.
