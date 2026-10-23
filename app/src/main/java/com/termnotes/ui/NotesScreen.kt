@@ -198,7 +198,7 @@ fun TermNotesApp(
                 }
             }
             if (crtEnabled) {
-                Canvas(Modifier.fillMaxSize()) {
+                Canvas(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                     val gap = 5.dp.toPx()
                     var y = 0f
                     while (y < size.height) {
