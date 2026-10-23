@@ -31,6 +31,7 @@ class NotesViewModel(private val repository: NotesRepository) : ViewModel() {
         if (title.isBlank() && content.isBlank()) return false
         val now = System.currentTimeMillis()
         val existing = if (noteId == null) null else repository.allNotes().firstOrNull { it.id == noteId }
+        if (noteId != null && existing == null) return false
         val finalTitle = title.ifBlank { content.lineSequence().firstOrNull()?.trim()?.take(48).orEmpty().ifBlank { "Untitled note" } }
         repository.save(Note(id = existing?.id ?: 0L, title = finalTitle, content = content, createdAt = existing?.createdAt ?: now, updatedAt = now))
         return true
