@@ -320,53 +320,134 @@ private fun NoteCard(note: Note, palette: com.termnotes.ui.theme.TermPalette, fo
 }
 
 @Composable
-private fun NoteEditorDialog(note: Note?, palette: com.termnotes.ui.theme.TermPalette, font: FontFamily, onDismiss: () -> Unit, onSave: (String, String) -> Unit, onDelete: (() -> Unit)?) {
+private fun NoteEditorDialog(
+    note: Note?,
+    palette: com.termnotes.ui.theme.TermPalette,
+    font: FontFamily,
+    onDismiss: () -> Unit,
+    onSave: (String, String) -> Unit,
+    onDelete: (() -> Unit)?
+) {
     var title by remember(note?.id) { mutableStateOf(note?.title.orEmpty()) }
     var body by remember(note?.id) { mutableStateOf(note?.content.orEmpty()) }
-    var preview by remember { mutableStateOf(false) }
+    var preview by remember(note?.id) { mutableStateOf(false) }
     var showDelete by remember { mutableStateOf(false) }
     val valid = title.isNotBlank() || body.isNotBlank()
-    AlertDialog(onDismissRequest = onDismiss, containerColor = palette.panel,
-        title = { Text(if (note == null) "NEW_NOTE.md" else "EDIT_NOTE.md", color = palette.accent, fontFamily = font, fontWeight = FontWeight.Bold) },
-        text = {
-            Column {
-                OutlinedTextField(title, { title = it }, Modifier.fillMaxWidth(), textStyle = LocalTextStyle.current.copy(fontFamily = font), label = { Text("TITLE", fontFamily = font) }, singleLine = true, colors = terminalFieldColors(palette))
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val maxDialogHeight = (configuration.screenHeightDp.dp - 80.dp).coerceAtLeast(300.dp)
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(0.94f).heightIn(min = 300.dp, max = maxDialogHeight)
+                .imePadding().windowInsetsPadding(WindowInsets.safeDrawing),
+            color = palette.panel,
+            shape = RoundedCornerShape(18.dp),
+            border = BorderStroke(1.dp, palette.border)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 300.dp, max = maxDialogHeight)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    if (note == null) "NEW_NOTE.md" else "EDIT_NOTE.md",
+                    color = palette.accent, fontFamily = font, fontWeight = FontWeight.Bold, fontSize = 18.sp
+                )
                 Spacer(Modifier.height(8.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = { preview = false }) { Text("EDIT", color = if (!preview) palette.accent else palette.muted, fontFamily = font) }
-                    TextButton(onClick = { preview = true }) { Text("PREVIEW", color = if (preview) palette.accent else palette.muted, fontFamily = font) }
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(fontFamily = font, fontSize = 14.sp),
+                    label = { Text("TITLE", fontFamily = font) },
+                    singleLine = true,
+                    colors = terminalFieldColors(palette)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 2.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { preview = false }, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)) {
+                        Text(if (!preview) "● EDIT" else "EDIT", color = if (!preview) palette.accent else palette.muted, fontFamily = font)
+                    }
+                    TextButton(onClick = { preview = true }, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)) {
+                        Text(if (preview) "● PREVIEW" else "PREVIEW", color = if (preview) palette.accent else palette.muted, fontFamily = font)
+                    }
                 }
-                if (preview) {
-                    LazyColumn(Modifier.fillMaxWidth().height(250.dp).background(palette.background, RoundedCornerShape(8.dp)).padding(10.dp)) {
-                        items(body.lines()) { line ->
-                            val code = line.trimStart().startsWith("```")
-                            val heading = line.startsWith("#")
-                            Text(if (code) "" else line.replace(Regex("^#{1,6}\\s+"), "").replace(Regex("\\*\\*(.*?)\\*\\*"), "$1").replace(Regex("\\*(.*?)\\*"), "$1").replace(Regex("`([^`]+)`"), "$1"),
-                                color = if (code) palette.accent else palette.text,
-                                fontFamily = if (code || line.contains("`")) FontFamily.Monospace else font,
-                                fontWeight = if (heading) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = if (heading) 16.sp else 13.sp,
-                                modifier = if (code || line.trimStart().startsWith("- ") || line.trimStart().matches(Regex("\\d+\\..*"))) Modifier.fillMaxWidth().background(if (code) palette.panel else Color.Transparent).padding(vertical = 2.dp) else Modifier.padding(vertical = 2.dp)
-                            )
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth().background(palette.background, RoundedCornerShape(8.dp))
+                        .padding(8.dp)
+                ) {
+                    if (preview) {
+                        LazyColumn(Modifier.fillMaxSize()) {
+                            items(body.split("\n")) { line ->
+                                val code = line.trimStart().startsWith("```")
+                                val heading = line.startsWith("#")
+                                Text(
+                                    if (code) "" else line.replace(Regex("^#{1,6}\\s+"), "")
+                                        .replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
+                                        .replace(Regex("\\*(.*?)\\*"), "$1")
+                                        .replace(Regex("`([^`]+)`"), "$1"),
+                                    color = if (code) palette.accent else palette.text,
+                                    fontFamily = font,
+                                    fontWeight = if (heading) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = if (heading) 16.sp else 13.sp,
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        OutlinedTextField(
+                            value = body,
+                            onValueChange = { body = it },
+                            modifier = Modifier.fillMaxSize(),
+                            textStyle = LocalTextStyle.current.copy(fontFamily = font, fontSize = 14.sp),
+                            placeholder = { Text("Write a note...\n# Heading\n**bold**  `code`\n- list item", fontFamily = font, fontSize = 12.sp) },
+                            colors = terminalFieldColors(palette)
+                        )
+                    }
+                }
+                Text(
+                    "Markdown preview is read-only. Original text is preserved.",
+                    color = palette.muted, fontSize = 10.sp, fontFamily = font,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (onDelete != null) {
+                        TextButton(onClick = { showDelete = true }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                            Text("DELETE", color = Color(0xFFFF6B6B), fontFamily = font)
                         }
                     }
-                } else {
-                    OutlinedTextField(body, { body = it }, Modifier.fillMaxWidth().height(250.dp), label = { Text("MARKDOWN / TEXT") }, placeholder = { Text("Write a note...\n# Heading\n**bold**  `code`\n- list item\n```\ncode block\n```") }, colors = terminalFieldColors(palette))
+                    Spacer(Modifier.weight(1f))
+                    TextButton(onClick = onDismiss, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                        Text("CANCEL", color = palette.muted, fontFamily = font)
+                    }
+                    Button(
+                        onClick = { onSave(title, body) },
+                        enabled = valid,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background)
+                    ) { Text("SAVE", fontFamily = font, fontWeight = FontWeight.Bold) }
                 }
-                Text("Markdown preview is read-only. Original text is preserved.", color = palette.muted, fontSize = 10.sp, modifier = Modifier.padding(top = 6.dp))
             }
-        },
-        confirmButton = { Button(onClick = { onSave(title, body) }, enabled = valid, colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background)) { Text("SAVE", fontFamily = font, fontWeight = FontWeight.Bold) } },
-        dismissButton = { Row(verticalAlignment = Alignment.CenterVertically) {
-            if (onDelete != null) TextButton(onClick = { showDelete = true }) { Text("DELETE", color = Color(0xFFFF6B6B), fontFamily = font) }
-            TextButton(onClick = onDismiss) { Text("CANCEL", color = palette.muted, fontFamily = font) }
-        } }
-    )
-    if (showDelete && onDelete != null) AlertDialog(onDismissRequest = { showDelete = false }, containerColor = palette.panel,
-        title = { Text("DELETE NOTE?", color = Color(0xFFFF6B6B), fontFamily = font) },
-        text = { Text("This note will be removed from this device.", color = palette.text) },
-        confirmButton = { TextButton(onClick = onDelete) { Text("DELETE", color = Color(0xFFFF6B6B)) } },
-        dismissButton = { TextButton(onClick = { showDelete = false }) { Text("KEEP NOTE", color = palette.accent) } })
+        }
+    }
+    if (showDelete && onDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDelete = false }, containerColor = palette.panel,
+            title = { Text("DELETE NOTE?", color = Color(0xFFFF6B6B), fontFamily = font) },
+            text = { Text("This note will be removed from this device.", color = palette.text, fontFamily = font) },
+            confirmButton = { TextButton(onClick = onDelete) { Text("DELETE", color = Color(0xFFFF6B6B), fontFamily = font) } },
+            dismissButton = { TextButton(onClick = { showDelete = false }) { Text("KEEP NOTE", color = palette.accent, fontFamily = font) } }
+        )
+    }
 }
 
 @Composable
