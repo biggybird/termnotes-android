@@ -1,67 +1,65 @@
 # TERMNOTES
 
-> **[⬇ Download the latest TERMNOTES APK](https://github.com/biggybird/termnotes-android/releases/download/latest-apk/app-debug.apk)**  
-> This direct link is updated automatically by the successful `main`-branch build. The repository is private, so you must be signed in with repository access. This is a debug APK for testing.
+**A native, offline-first notes app with a retro terminal soul.**  
+Built with Kotlin, Jetpack Compose, Material 3, and Room. Your notes stay on your device.
 
-A native Android terminal-inspired notes app built with Kotlin, Jetpack Compose, Material 3, and Room. It works offline and stores notes on the device.
+<p align="center">
+  <a href="https://github.com/biggybird/termnotes-android/releases/download/latest-apk/app-debug.apk"><strong>⬇ Download the latest debug APK</strong></a>
+  ·
+  <a href="https://github.com/biggybird/termnotes-android/actions">Build history</a>
+  ·
+  <a href="https://github.com/biggybird/termnotes-android/issues">Report a bug</a>
+</p>
 
-## Current features
+[![Build TERMNOTES APK](https://github.com/biggybird/termnotes-android/actions/workflows/build-apk.yml/badge.svg)](https://github.com/biggybird/termnotes-android/actions/workflows/build-apk.yml)
 
-- Create, edit, search, and delete notes with confirmation.
-- Room/SQLite local persistence with creation and modification timestamps.
-- Four selectable themes: Hacker Green, Amber CRT, Matrix Blue, and Retro White.
-- Locally saved theme, font choice, CRT scanline, and sound preferences.
-- Terminal command input with `help`, `list`, `new`, `search <text>`, `clear`, `:new`, `:theme`, `:clear`, and `:help`.
-- In-memory command history using keyboard Up/Down keys where the keyboard provides them.
-- Basic Markdown editor/preview for headings, emphasis markers, lists, inline code, and fenced code markers. Code is never executed.
-- JSON backup export using Android's file picker.
-- JSON backup import validates the backup before changes, merges notes, and skips duplicate title/body pairs.
-- Optional native Compose scanline overlay and optional save confirmation beep.
-- Edge-to-edge layout with native safe-drawing and keyboard insets.
+> **APK note:** The download above is intended to point to the latest successful main-branch debug build. If it is temporarily unavailable, open the [Actions page](https://github.com/biggybird/termnotes-android/actions), choose the newest successful run, and download its `TermNotes-debug-apk` artifact. The repository is public, so you do not need repository access to browse the source. A debug APK is for testing, not a production release.
 
-## Appearance and fonts
+## ✨ Features
 
-Theme selection and font selection are saved locally. Typography includes System Monospace, System Serif, System Sans Serif, and the bundled VT323 retro terminal typeface shown in the selector as “Nothing CRT.” Its SIL Open Font License is included at `app/src/main/assets/licenses/OFL-VT323.txt`. No remote fonts are loaded.
+- **Local notes:** Create, view, edit, search, and delete notes.
+- **Offline by design:** Notes and preferences are stored locally with Room/SQLite.
+- **Four themes:** Hacker Green, Amber CRT, Matrix Blue, and Retro White.
+- **Font choices:** System Monospace, System Serif, System Sans Serif, and **Nothing CRT**, a bundled retro terminal typeface based on VT323.
+- **CRT scanlines:** Optional subtle scanline overlay.
+- **Save feedback:** Optional short confirmation tone after a successful save.
+- **Terminal commands:** `help`, `list`, `new`, `search <text>`, `clear`, `:new`, `:theme`, `:clear`, and `:help`.
+- **Command history:** Use Up/Down where the Android keyboard exposes those key events.
+- **Markdown preview:** Lightweight support for common headings, emphasis, lists, inline code, and fenced code markers. Code is displayed, never executed.
+- **JSON backups:** Export notes through Android's file picker and merge-import validated backups.
+- **Native Android UI:** Compose layouts, system insets, and keyboard-aware behavior.
 
-CRT scanlines and the save sound are off by default. Scanlines use a lightweight Compose drawing layer. Save confirmation uses a short Android system notification tone after a successful note save and releases the tone generator after playback.
+## 📱 Download and install
 
-## Privacy and storage
+1. Tap **Download the latest debug APK** at the top of this page.
+2. If the direct link is not available yet, use the [GitHub Actions builds](https://github.com/biggybird/termnotes-android/actions) and open the newest run marked **Success**.
+3. Download the `TermNotes-debug-apk` artifact ZIP and extract it.
+4. Open `app-debug.apk` on your Android device and follow the installation prompt.
+5. Android may ask you to allow installation from your browser or file manager. Only install APKs you trust.
 
-- No account, API key, analytics, or cloud sync is required.
-- The app manifest does not request internet access.
-- Notes and preferences stay in app-private storage on the device.
-- Exported backups are written only to the location selected in Android's file picker.
-- Import uses a merge strategy. The entire JSON structure is validated before database insertion; existing matching title/body pairs are skipped.
-- Notes are not encrypted by this app. Clearing app storage or uninstalling the app removes local notes, so export backups for anything important.
+The APK produced by this workflow is a **debug build**. It is not a signed production release.
 
-## Technology stack
+## 🛠 Tech stack
 
-- Kotlin and Jetpack Compose
-- Material 3
+- Kotlin
+- Jetpack Compose and Material 3
 - Room / SQLite
 - Gradle Kotlin DSL
-- JDK 17, Gradle 8.13, Android Gradle Plugin 8.13.2
-- Android SDK 36, minimum SDK 26
+- JDK 17
+- Gradle 8.13
+- Android Gradle Plugin 8.13.2
+- Android SDK 36
+- Minimum SDK: 26
 
 Dependency versions are managed in `gradle/libs.versions.toml`.
 
-## Build the APK with GitHub Actions
+## 🧑‍💻 Build locally
 
-The workflow is `.github/workflows/build-apk.yml`. It runs on pushes to `main` and can be started manually with **workflow_dispatch**. It runs unit tests, Android lint, builds a debug APK with the project Gradle wrapper, checks that the APK exists, and uploads the artifact `TermNotes-debug-apk` for 14 days.
+### Requirements
 
-### Download on Android
+Install JDK 17 and Android SDK Platform 36 with Android Build Tools 36.0.0. The first build needs network access to download Gradle and dependencies.
 
-1. Open the repository's [Actions page](https://github.com/biggybird/termnotes-android/actions).
-2. Select the newest **Build TermNotes APK** run and wait for **Success**.
-3. Open the run and download the **TermNotes-debug-apk** artifact ZIP.
-4. Extract the ZIP in your Files app and tap `app-debug.apk`.
-5. Follow Android's installation prompt. Only allow installation from a source you trust.
-
-The repository is private, so sign in to the GitHub account with access. A debug APK is intended for testing and is not a signed production release.
-
-### Build locally
-
-Requirements: JDK 17, Android SDK Platform 36, build tools 36.0.0, and network access for first-time dependency downloads.
+### Commands
 
 ```bash
 git clone https://github.com/biggybird/termnotes-android.git
@@ -72,15 +70,42 @@ chmod +x ./gradlew
 ./gradlew :app:assembleDebug
 ```
 
-APK output: `app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK is generated at:
 
-## Verification notes
+```
+app/build/outputs/apk/debug/app-debug.apk
+```
 
-A successful CI APK build verifies compilation and artifact creation, but it does not prove all runtime behavior. The workflow now also runs unit tests and lint. Emulator and physical-device testing must be reported separately when performed. The Nothing CRT option uses the bundled VT323 font; other system font options use their corresponding Android system families.
+## ⚙️ Continuous integration
 
-## Known limitations
+The workflow lives at [`.github/workflows/build-apk.yml`](https://github.com/biggybird/termnotes-android/blob/main/.github/workflows/build-apk.yml). It runs on pushes to `main` and supports manual runs. It runs unit tests, Android lint, assembles the debug APK, verifies that the APK exists, and uploads the `TermNotes-debug-apk` artifact.
 
-- The Markdown preview is intentionally lightweight and does not implement the entire Markdown specification.
-- Fira Code is not bundled. The Nothing CRT option uses the bundled, licensed VT323 font.
-- Command Up/Down history depends on the Android keyboard exposing arrow key events.
-- No signed production release configuration or physical-device test is claimed.
+The workflow also attempts to publish a rolling download at the direct APK link above after a successful build. Check the [latest workflow run](https://github.com/biggybird/termnotes-android/actions) if a release asset has not appeared.
+
+## 🔐 Privacy and data
+
+- No account, API key, analytics, or cloud sync is required by the app.
+- The app is designed to work offline; it does not require internet access for note-taking.
+- Notes and preferences are kept in app-private storage on the device.
+- Backups are written only to the location you choose in Android's file picker.
+- Import uses a merge strategy, validates the JSON structure, and skips duplicate title/body pairs.
+- **Notes are not encrypted by this app.** Clearing app storage or uninstalling the app removes local notes. Export a backup before removing the app or clearing its data.
+
+## 🔤 Fonts and attribution
+
+The **Nothing CRT** selector label is a visual style name, not an official Nothing Phone font. It uses the bundled VT323 retro terminal typeface, distributed under the SIL Open Font License. The license and attribution are included at `app/src/main/assets/licenses/OFL-VT323.txt`. The app does not download fonts at runtime.
+
+## ℹ️ Limitations
+
+- Markdown support is intentionally lightweight and does not cover the full Markdown specification.
+- Fira Code is not bundled.
+- Command history arrow keys depend on keyboard event support.
+- CI checks compilation, tests, lint, and APK packaging; emulator and physical-device behavior should be verified separately.
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome. If something breaks, please include your Android version, device model, steps to reproduce, and relevant logs, while avoiding private note contents.
+
+---
+
+Made for people who like their notes local and their terminals green. 💚
