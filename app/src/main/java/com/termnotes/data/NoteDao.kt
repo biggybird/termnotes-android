@@ -13,8 +13,14 @@ interface NoteDao {
     @Query("SELECT * FROM notes ORDER BY updatedAt DESC, id DESC")
     fun observeAll(): Flow<List<Note>>
 
+    @Query("SELECT * FROM notes ORDER BY updatedAt DESC, id DESC")
+    suspend fun getAll(): List<Note>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: Note): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(notes: List<Note>)
 
     @Update
     suspend fun update(note: Note)
