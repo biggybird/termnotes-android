@@ -404,7 +404,7 @@ private fun NoteEditorDialog(
                         }
                     } else {
                         OutlinedTextField(
-                            value = body,
+                            value = bodyField,
                             onValueChange = { bodyField = it },
                             modifier = Modifier.fillMaxSize(),
                             textStyle = LocalTextStyle.current.copy(fontFamily = font, fontSize = 14.sp),
