@@ -36,7 +36,7 @@ import java.util.Date
 import java.util.Locale
 
 private val themes = listOf("Hacker Green", "Amber CRT", "Matrix Blue", "Retro White")
-private val fonts = listOf("System Monospace", "Courier New-style", "Fira Code", "VT323")
+private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif")
 
 @Composable
 fun TermNotesApp(
@@ -87,9 +87,8 @@ fun TermNotesApp(
     }
 
     val mono = when (fontName) {
-        "Courier New-style" -> FontFamily.Monospace
-        // Fira Code and VT323 fall back safely until licensed local font assets are bundled.
-        "Fira Code", "VT323" -> FontFamily.Monospace
+        "System Serif" -> FontFamily.Serif
+        "System Sans Serif" -> FontFamily.SansSerif
         else -> FontFamily.Monospace
     }
 
@@ -101,8 +100,8 @@ fun TermNotesApp(
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Column(Modifier.weight(1f)) {
-                        Text("TERMNOTES", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold, fontSize = 25.sp)
-                        Text("LOCAL STORAGE  /  OFFLINE", color = palette.muted, fontFamily = mono, fontSize = 10.sp, letterSpacing = 1.sp)
+                        Text("TERMNOTES", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold, fontSize = 23.sp, maxLines = 1, softWrap = false)
+                        Text("LOCAL STORAGE  /  OFFLINE", color = palette.muted, fontFamily = mono, fontSize = 9.sp, letterSpacing = 0.5.sp, maxLines = 1)
                     }
                     TextButton(onClick = { showSettings = true }) { Text("⚙ SETTINGS", color = palette.accent, fontFamily = mono, fontSize = 11.sp) }
                     Spacer(Modifier.width(4.dp))
@@ -192,7 +191,7 @@ fun TermNotesApp(
                     var y = 0f
                     while (y < size.height) {
                         drawLine(
-                            color = Color.Black.copy(alpha = if (palette.isLight) 0.025f else 0.055f),
+                            color = (if (palette.isLight) Color.Black else Color.White).copy(alpha = if (palette.isLight) 0.045f else 0.10f),
                             start = Offset(0f, y),
                             end = Offset(size.width, y),
                             strokeWidth = 1.dp.toPx()
@@ -213,7 +212,12 @@ fun TermNotesApp(
                 scope.launch {
                     if (viewModel.saveNote(selected?.id, title, body)) {
                         editingNote = null; isCreating = false; message = "Note saved."
-                        if (soundEnabled) runCatching { android.media.ToneGenerator(android.media.AudioManager.STREAM_SYSTEM, 35).startTone(android.media.ToneGenerator.TONE_PROP_ACK, 70) }
+                        if (soundEnabled) runCatching {
+                            val tone = android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 45)
+                            if (tone.startTone(android.media.ToneGenerator.TONE_PROP_ACK, 75)) {
+                                scope.launch { kotlinx.coroutines.delay(180); tone.release() }
+                            } else tone.release()
+                        }
                     }
                 }
             },
