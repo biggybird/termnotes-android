@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
@@ -23,8 +24,8 @@ class MainActivity : ComponentActivity() {
         val database = Room.databaseBuilder(applicationContext, NotesDatabase::class.java, "termnotes.db").build()
         val repository = NotesRepository(database.noteDao())
         setContent {
-            var selectedTheme by mutableStateOf(AppPreferences.theme(this))
-            var selectedFont by mutableStateOf(AppPreferences.font(this))
+            var selectedTheme by remember { mutableStateOf(AppPreferences.theme(this)) }
+            var selectedFont by remember { mutableStateOf(AppPreferences.font(this)) }
             TermNotesTheme(themeName = selectedTheme) {
                 val notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory(repository))
                 TermNotesApp(
