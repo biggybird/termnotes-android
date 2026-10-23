@@ -19,6 +19,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +41,7 @@ import java.util.Date
 import java.util.Locale
 
 private val themes = listOf("Hacker Green", "Amber CRT", "Matrix Blue", "Retro White")
-private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif")
+private val fonts = listOf("System Monospace", "System Serif", "System Sans Serif", "Nothing CRT")
 
 @Composable
 fun TermNotesApp(
@@ -66,6 +69,8 @@ fun TermNotesApp(
     var crtEnabled by remember { mutableStateOf(AppPreferences.crt(context)) }
     var soundEnabled by remember { mutableStateOf(AppPreferences.sound(context)) }
     var message by remember { mutableStateOf<String?>(null) }
+    val saveTone = remember(context) { runCatching { android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 35) }.getOrNull() }
+    DisposableEffect(saveTone) { onDispose { runCatching { saveTone?.release() } } }
 
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri != null) scope.launch {
@@ -91,6 +96,7 @@ fun TermNotesApp(
     val mono = when (fontName) {
         "System Serif" -> FontFamily.Serif
         "System Sans Serif" -> FontFamily.SansSerif
+        "Nothing CRT" -> FontFamily(Font(R.font.nothing_crt))
         else -> FontFamily.Monospace
     }
 
@@ -124,6 +130,7 @@ fun TermNotesApp(
                 Spacer(Modifier.height(16.dp))
                 OutlinedTextField(
                     value = command, onValueChange = { command = it; historyIndex = -1 },
+                    textStyle = LocalTextStyle.current.copy(fontFamily = mono),
                     modifier = Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
                         if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                         when (event.nativeKeyEvent.keyCode) {
@@ -222,15 +229,16 @@ fun TermNotesApp(
             onDismiss = { editingNote = null; isCreating = false },
             onSave = { title, body ->
                 scope.launch {
-                    if (viewModel.saveNote(selected?.id, title, body)) {
-                        editingNote = null; isCreating = false; message = "Note saved."
-                        if (soundEnabled) runCatching {
-                            val tone = android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 45)
-                            if (tone.startTone(android.media.ToneGenerator.TONE_PROP_ACK, 75)) {
-                                scope.launch { kotlinx.coroutines.delay(180); tone.release() }
-                            } else tone.release()
+                    runCatching { viewModel.saveNote(selected?.id, title, body) }
+                        .onSuccess { saved ->
+                            if (saved) {
+                                editingNote = null
+                                isCreating = false
+                                message = "Note saved."
+                                if (soundEnabled) runCatching { saveTone?.startTone(android.media.ToneGenerator.TONE_PROP_ACK, 85) }
+                            } else message = "A title or note body is required."
                         }
-                    }
+                        .onFailure { error -> message = "Save failed. Your editor is still open. " + (error.message ?: "") }
                 }
             },
             onDelete = selected?.let { note -> { viewModel.deleteNote(note); editingNote = null; isCreating = false; message = "Note deleted." } }
@@ -322,7 +330,7 @@ private fun NoteEditorDialog(note: Note?, palette: com.termnotes.ui.theme.TermPa
         title = { Text(if (note == null) "NEW_NOTE.md" else "EDIT_NOTE.md", color = palette.accent, fontFamily = font, fontWeight = FontWeight.Bold) },
         text = {
             Column {
-                OutlinedTextField(title, { title = it }, Modifier.fillMaxWidth(), label = { Text("TITLE") }, singleLine = true, colors = terminalFieldColors(palette))
+                OutlinedTextField(title, { title = it }, Modifier.fillMaxWidth(), textStyle = LocalTextStyle.current.copy(fontFamily = font), label = { Text("TITLE", fontFamily = font) }, singleLine = true, colors = terminalFieldColors(palette))
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = { preview = false }) { Text("EDIT", color = if (!preview) palette.accent else palette.muted, fontFamily = font) }
