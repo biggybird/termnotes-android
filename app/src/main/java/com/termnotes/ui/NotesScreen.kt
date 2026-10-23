@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.input.key.*
+import com.termnotes.R
 import com.termnotes.data.Note
 import com.termnotes.ui.theme.paletteFor
 import kotlinx.coroutines.launch
