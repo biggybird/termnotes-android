@@ -27,7 +27,7 @@ class NotesViewModel(private val repository: NotesRepository) : ViewModel() {
 
     suspend fun saveNote(noteId: Long?, titleInput: String, contentInput: String): Boolean {
         val title = titleInput.trim()
-        val content = contentInput.trimEnd()
+        val content = contentInput
         if (title.isBlank() && content.isBlank()) return false
         val now = System.currentTimeMillis()
         val existing = if (noteId == null) null else repository.allNotes().firstOrNull { it.id == noteId }
