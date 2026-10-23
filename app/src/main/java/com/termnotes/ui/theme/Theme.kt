@@ -12,14 +12,8 @@ fun paletteFor(themeName: String): TermPalette = when (themeName) {
     "Amber CRT" -> TermPalette(Color(0xFF0A0700), Color(0xFF171006), Color(0xFFFFB000), Color(0xFFB58A38), Color(0xFFFFE7B0), Color(0xFF49330D), false)
     "Matrix Blue" -> TermPalette(Color(0xFF030712), Color(0xFF0B1220), Color(0xFF38BDF8), Color(0xFF7B9EB8), Color(0xFFE0F2FE), Color(0xFF18364A), false)
     "Retro White" -> TermPalette(Color(0xFFF4F1E8), Color(0xFFFFFFFF), Color(0xFF242424), Color(0xFF555555), Color(0xFF202020), Color(0xFFD0CCC1), true)
-    else -> TermPalette(Color.Black, Color(0xFF0A0A0A), Color(0xFF39FF14), Color(0xFF789078), Color(0xFFE8FFE8), Color(0xFF183318), false)
+    else -> TermPalette(Color.Black, Color(0xFF0A0A0A), TermGreen, TermMuted, TermText, Color(0xFF183318), false)
 }
-
-val TermGreen = Color(0xFF39FF14)
-val TermGreenDark = Color(0xFF00C853)
-val TermPanel = Color(0xFF0A0A0A)
-val TermMuted = Color(0xFF789078)
-val TermText = Color(0xFFE8FFE8)
 
 @Composable
 fun TermNotesTheme(themeName: String = "Hacker Green", content: @Composable () -> Unit) {
