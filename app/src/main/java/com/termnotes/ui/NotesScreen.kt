@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -329,7 +330,8 @@ private fun NoteEditorDialog(
     onDelete: (() -> Unit)?
 ) {
     var title by remember(note?.id) { mutableStateOf(note?.title.orEmpty()) }
-    var body by remember(note?.id) { mutableStateOf(note?.content.orEmpty()) }
+    var bodyField by remember(note?.id) { mutableStateOf(TextFieldValue(note?.content.orEmpty())) }
+    val body = bodyField.text
     var preview by remember(note?.id) { mutableStateOf(false) }
     var showDelete by remember { mutableStateOf(false) }
     val valid = title.isNotBlank() || body.isNotBlank()
@@ -402,7 +404,7 @@ private fun NoteEditorDialog(
                     } else {
                         OutlinedTextField(
                             value = body,
-                            onValueChange = { body = it },
+                            onValueChange = { bodyField = it },
                             modifier = Modifier.fillMaxSize(),
                             textStyle = LocalTextStyle.current.copy(fontFamily = font, fontSize = 14.sp),
                             placeholder = { Text("Write a note...\n# Heading\n**bold**  `code`\n- list item", fontFamily = font, fontSize = 12.sp) },
@@ -430,7 +432,7 @@ private fun NoteEditorDialog(
                         Text("CANCEL", color = palette.muted, fontFamily = font)
                     }
                     Button(
-                        onClick = { onSave(title, body) },
+                        onClick = { onSave(title, bodyField.text) },
                         enabled = valid,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background)
