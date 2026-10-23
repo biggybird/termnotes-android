@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onPreviewKeyEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -186,8 +188,18 @@ fun TermNotesApp(
                 }
             }
             if (crtEnabled) {
-                Column(Modifier.fillMaxSize()) {
-                    repeat(80) { Box(Modifier.fillMaxWidth().height(2.dp).background(Color.Black.copy(alpha = 0.045f))); Spacer(Modifier.height(2.dp)) }
+                Canvas(Modifier.fillMaxSize()) {
+                    val gap = 5.dp.toPx()
+                    var y = 0f
+                    while (y < size.height) {
+                        drawLine(
+                            color = Color.Black.copy(alpha = if (palette.isLight) 0.025f else 0.055f),
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                        y += gap
+                    }
                 }
             }
         }
