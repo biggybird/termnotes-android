@@ -100,15 +100,25 @@ fun TermNotesApp(
                 Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
                     .imePadding().padding(horizontal = 18.dp, vertical = 12.dp)
             ) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    Column(Modifier.weight(1f)) {
-                        Text("TERMNOTES", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold, fontSize = 23.sp, maxLines = 1, softWrap = false)
-                        Text("LOCAL STORAGE  /  OFFLINE", color = palette.muted, fontFamily = mono, fontSize = 9.sp, letterSpacing = 0.5.sp, maxLines = 1)
-                    }
-                    TextButton(onClick = { showSettings = true }) { Text("⚙ SETTINGS", color = palette.accent, fontFamily = mono, fontSize = 11.sp) }
-                    Spacer(Modifier.width(4.dp))
-                    Button(onClick = { isCreating = true }, colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background), shape = RoundedCornerShape(10.dp)) {
-                        Text("+ NEW", fontFamily = mono, fontWeight = FontWeight.Bold)
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    if (maxWidth < 430.dp) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("TERMNOTES", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold, fontSize = 23.sp, maxLines = 1, softWrap = false)
+                            Text("LOCAL STORAGE / OFFLINE", color = palette.muted, fontFamily = mono, fontSize = 9.sp, maxLines = 1)
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                                TextButton(onClick = { showSettings = true }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("⚙ SETTINGS", color = palette.accent, fontFamily = mono, fontSize = 11.sp, maxLines = 1) }
+                                Button(onClick = { isCreating = true }, contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background), shape = RoundedCornerShape(10.dp)) { Text("+ NEW", fontFamily = mono, fontWeight = FontWeight.Bold, maxLines = 1) }
+                            }
+                        }
+                    } else {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column(Modifier.weight(1f)) {
+                                Text("TERMNOTES", color = palette.accent, fontFamily = mono, fontWeight = FontWeight.Bold, fontSize = 23.sp, maxLines = 1, softWrap = false)
+                                Text("LOCAL STORAGE / OFFLINE", color = palette.muted, fontFamily = mono, fontSize = 9.sp, maxLines = 1)
+                            }
+                            TextButton(onClick = { showSettings = true }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("⚙ SETTINGS", color = palette.accent, fontFamily = mono, fontSize = 11.sp, maxLines = 1) }
+                            Button(onClick = { isCreating = true }, contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = palette.accent, contentColor = palette.background), shape = RoundedCornerShape(10.dp)) { Text("+ NEW", fontFamily = mono, fontWeight = FontWeight.Bold, maxLines = 1) }
+                        }
                     }
                 }
                 Spacer(Modifier.height(16.dp))
